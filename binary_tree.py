@@ -60,7 +60,8 @@ class Tree:
             node_t = node.t
             node_n = node.n
 
-            if node_n == -1 or key == 0:
+            # if node_n == -1 or key == 0:
+            if node_n != 0:
                 print(f"Node {key} with value {node_t/node_n}")
 
     def pp_tree(self, node_key, level):

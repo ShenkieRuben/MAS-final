@@ -5,12 +5,11 @@ import numpy as np
 
 
 class MCTS():
-    def __init__(self, c, d, max_iters, max_rollouts, nr_iters):
+    def __init__(self, c, d, nr_iters, max_rollouts):
         self.c = c
         self.d = d
-        self.max_iters = max_iters
-        self.max_rollouts = max_rollouts
         self.nr_iters = nr_iters
+        self.max_rollouts = max_rollouts
 
         num_leaves = 2 ** self.d
 
@@ -19,6 +18,8 @@ class MCTS():
             self.tree.insert()
 
         self.tree.assign_vals_to_leafs(num_leaves)
+
+    # def compute_xbar(self, node_key):
 
     def compute_UCB(self, node_key):
 
@@ -41,18 +42,18 @@ class MCTS():
     def select_node(self):
         # Always start at the root
         node_key = 0
-        temp_node = node_key
         path = []
 
-        # The root
+        # The root, special case
         if self.tree.data[node_key].n == 0:
+            path.append(node_key)
+            node_key = self.get_random_child(node_key)
             path.append(node_key)
             return node_key, path
 
         # Larger than 0 to prevent computing UCB values on leaves.
 
-        while(node_key in self.tree.data and self.tree.data[node_key].n > 0):
-            temp_node = node_key
+        while node_key in self.tree.data and self.tree.data[node_key].n > 0:
             path.append(node_key)
             left = self.tree.get_left_child(node_key)
             right = self.tree.get_right_child(node_key)
@@ -71,9 +72,11 @@ class MCTS():
                 else:
                     node_key = right
 
-        return temp_node, path
+        path.append(node_key)
 
-    def expand_node(self, node_key):
+        return node_key, path
+
+    def get_random_child(self, node_key):
         random_val = np.random.uniform()
         # Pick left unexplored child
         if random_val > 0.5:
@@ -90,31 +93,56 @@ class MCTS():
         temp_node = node_key
         while(node_key in self.tree.data):
             temp_node = node_key
-            node_key = self.expand_node(node_key)
+            node_key = self.get_random_child(node_key)
 
         return self.tree.data[temp_node].t / self.tree.data[temp_node].n
 
     # Backup the values from the unexplored node to the root (reverse tree policy path)
 
-    def backup(self, node_key, path, reward):
-        path.append(node_key)
+    def backup(self, path, reward):
         backup_path = path[::-1]
-
         for backup_key in backup_path:
             self.tree.data[backup_key].t += reward
             self.tree.data[backup_key].n += 1
 
     def perform_iters(self):
+        # TODO: decide whether to ignore or take into account bottom leaf nodes.
         for _ in range(self.nr_iters):
             node_key, path = self.select_node()
-            expand_node_key = self.expand_node(node_key)
-            if expand_node_key in self.tree.data and self.tree.data[expand_node_key].n >= 0:
-                rollout_reward = self.rollout(expand_node_key)
-                self.backup(expand_node_key, path, rollout_reward)
+            # Check if node key is leaf
+            if self.tree.data[node_key].n == 0:
+                rollout_reward = self.rollout(node_key)
+                self.backup(path, rollout_reward)
+
+    def find_optimal_path(self):
+        path = []
+        node_key = 0
+        while node_key in self.tree.data:
+            path.append(node_key)
+            left = self.tree.get_left_child(node_key)
+            right = self.tree.get_right_child(node_key)
+
+            if left in self.tree.data and right in self.tree.data:
+                left_xbar = self.tree.data[left].t / self.tree.data[left].n
+                right_xbar = self.tree.data[right].t / self.tree.data[right].n
+
+                if left_xbar > right_xbar:
+                    node_key = left
+                elif right_xbar > left_xbar:
+                    node_key = right
+                else:
+                    node_key = self.get_random_child(node_key)
+
+            else:
+                break
+
+        return path
 
 
 if __name__ == "__main__":
-    mcts = MCTS(2, 3, 50, 5, 100)
+    mcts = MCTS(2, 3, 50, 5)
+    mcts.tree.pp_tree(0, 0)
     mcts.perform_iters()
     mcts.tree.pp_tree(0, 0)
-    mcts.tree.debug_tree()
+    # mcts.tree.debug_tree()
+    print(mcts.find_optimal_path())
