@@ -5,11 +5,15 @@ import numpy as np
 
 
 class MCTS():
-    def __init__(self, c, d, nr_iters, max_rollouts):
+    def __init__(self, c, d, nr_iters, nr_rollouts):
         self.c = c
         self.d = d
         self.nr_iters = nr_iters
-        self.max_rollouts = max_rollouts
+        self.nr_rollouts = nr_rollouts
+
+        # Maintain current root and actual path
+        self.cur_root = 0
+        self.informed_path = [0]
 
         num_leaves = 2 ** self.d
 
@@ -41,7 +45,7 @@ class MCTS():
     # Return the snowcap leaf with the highest UCB.
     def select_node(self):
         # Always start at the root
-        node_key = 0
+        node_key = self.cur_root
         path = []
 
         # The root, special case
@@ -107,42 +111,53 @@ class MCTS():
 
     def perform_iters(self):
         # TODO: decide whether to ignore or take into account bottom leaf nodes.
-        for _ in range(self.nr_iters):
-            node_key, path = self.select_node()
-            # Check if node key is leaf
-            if self.tree.data[node_key].n == 0:
-                rollout_reward = self.rollout(node_key)
-                self.backup(path, rollout_reward)
+        while self.cur_root in self.tree.data:
+            for _ in range(self.nr_iters):
+                node_key, path = self.select_node()
+                # Check if node key is leaf
+                if self.tree.data[node_key].n == 0:
+                    for _ in range(self.nr_rollouts):
+                        rollout_reward = self.rollout(node_key)
+                        self.backup(path, rollout_reward)
 
-    def find_optimal_path(self):
-        path = []
-        node_key = 0
-        while node_key in self.tree.data:
-            path.append(node_key)
-            left = self.tree.get_left_child(node_key)
-            right = self.tree.get_right_child(node_key)
-
-            if left in self.tree.data and right in self.tree.data:
-                left_xbar = self.tree.data[left].t / self.tree.data[left].n
-                right_xbar = self.tree.data[right].t / self.tree.data[right].n
-
-                if left_xbar > right_xbar:
-                    node_key = left
-                elif right_xbar > left_xbar:
-                    node_key = right
-                else:
-                    node_key = self.get_random_child(node_key)
-
-            else:
+            temp_root = self.cur_root
+            decision_node = self.make_informed_decision()
+            if decision_node == -1:
                 break
+            else:
+                self.cur_root = decision_node
+                self.informed_path.append(self.cur_root)
 
-        return path
+    def make_informed_decision(self):
+        node_key = self.cur_root
+
+        left = self.tree.get_left_child(node_key)
+        right = self.tree.get_right_child(node_key)
+
+        if left in self.tree.data and right in self.tree.data:
+            left_xbar = self.tree.data[left].t / self.tree.data[left].n
+            right_xbar = self.tree.data[right].t / self.tree.data[right].n
+
+            if left_xbar > right_xbar:
+                node_key = left
+            elif right_xbar > left_xbar:
+                node_key = right
+            else:
+                node_key = self.get_random_child(node_key)
+        else:
+            # Non-existing
+            return -1
+
+        return node_key
 
 
 if __name__ == "__main__":
     mcts = MCTS(2, 3, 50, 5)
-    mcts.tree.pp_tree(0, 0)
     mcts.perform_iters()
     mcts.tree.pp_tree(0, 0)
     # mcts.tree.debug_tree()
-    print(mcts.find_optimal_path())
+
+    mcts.tree.print_max()
+    print(mcts.informed_path)
+    found = mcts.tree.data[mcts.informed_path[-1]]
+    print(found.t/found.n)

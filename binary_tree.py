@@ -64,6 +64,18 @@ class Tree:
             if node_n != 0:
                 print(f"Node {key} with value {node_t/node_n}")
 
+    def print_max(self):
+        max = -1
+        node_key = -1
+        for key, node in self.data.items():
+            if key in self.leaves:
+                xbar = node.t / node.n
+                if xbar > max:
+                    max = xbar
+                    node_key = key
+
+        print(f"Max node is {node_key} with value {max}")
+
     def pp_tree(self, node_key, level):
         if node_key >= 0 and node_key in self.data:
             left = self.get_left_child(node_key)
