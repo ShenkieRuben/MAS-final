@@ -3,6 +3,7 @@ class Cell:
         self.v = 0
         self.reward = -1
         self.is_reachable = is_reachable
+        self.is_visited = False
 
 
 class SpecialCell(Cell):
