@@ -64,7 +64,7 @@ class Tree:
             if node_n != 0:
                 print(f"Node {key} with value {node_t/node_n}")
 
-    def print_max(self):
+    def get_max(self):
         max = -1
         node_key = -1
         for key, node in self.data.items():
@@ -74,7 +74,8 @@ class Tree:
                     max = xbar
                     node_key = key
 
-        print(f"Max node is {node_key} with value {max}")
+        # print(f"Max node is {node_key} with value {max}")
+        return max
 
     def pp_tree(self, node_key, level):
         if node_key >= 0 and node_key in self.data:
@@ -86,9 +87,8 @@ class Tree:
             self.pp_tree(left, level+1)
 
     def assign_vals_to_leafs(self, total_leafs):
-        # TODO: change this to real numbers.
-        # vals = np.random.uniform(0, 100, total_leafs)
-        vals = np.random.randint(0, 100, total_leafs)
+        vals = np.random.uniform(0, 100, total_leafs)
+        # vals = np.random.randint(0, 100, total_leafs)
         temp_leaves = self.leaves.copy()
         for random_val in vals:
             leaf = temp_leaves.pop()

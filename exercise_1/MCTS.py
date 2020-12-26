@@ -110,17 +110,16 @@ class MCTS():
             self.tree.data[backup_key].n += 1
 
     def perform_iters(self):
-        # TODO: decide whether to ignore or take into account bottom leaf nodes.
         while self.cur_root in self.tree.data:
             for _ in range(self.nr_iters):
                 node_key, path = self.select_node()
                 # Check if node key is leaf
                 if self.tree.data[node_key].n == 0:
+                    # Perform a number of rollouts from that node.
                     for _ in range(self.nr_rollouts):
                         rollout_reward = self.rollout(node_key)
                         self.backup(path, rollout_reward)
 
-            temp_root = self.cur_root
             decision_node = self.make_informed_decision()
             if decision_node == -1:
                 break
@@ -152,12 +151,12 @@ class MCTS():
 
 
 if __name__ == "__main__":
-    mcts = MCTS(2, 3, 50, 5)
-    mcts.perform_iters()
-    mcts.tree.pp_tree(0, 0)
+
+    # mcts.tree.pp_tree(0, 0)
     # mcts.tree.debug_tree()
 
     mcts.tree.print_max()
-    print(mcts.informed_path)
-    found = mcts.tree.data[mcts.informed_path[-1]]
-    print(found.t/found.n)
+    # print(mcts.informed_path)
+    # found = mcts.tree.data[mcts.informed_path[-1]]
+    # print(found.t/found.n)
+    pass
