@@ -56,7 +56,6 @@ class MCTS():
             return node_key, path
 
         # Larger than 0 to prevent computing UCB values on leaves.
-
         while node_key in self.tree.data and self.tree.data[node_key].n > 0:
             path.append(node_key)
             left = self.tree.get_left_child(node_key)
@@ -151,11 +150,11 @@ class MCTS():
 
 
 if __name__ == "__main__":
-
-    # mcts.tree.pp_tree(0, 0)
+    mcts = MCTS(100, 4, 50, 5)
+    mcts.perform_iters()
+    mcts.tree.pp_tree(0, 0)
     # mcts.tree.debug_tree()
 
-    mcts.tree.print_max()
     # print(mcts.informed_path)
     # found = mcts.tree.data[mcts.informed_path[-1]]
     # print(found.t/found.n)
