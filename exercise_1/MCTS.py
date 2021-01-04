@@ -23,8 +23,6 @@ class MCTS():
 
         self.tree.assign_vals_to_leafs(num_leaves)
 
-    # def compute_xbar(self, node_key):
-
     def compute_UCB(self, node_key):
 
         if node_key not in self.tree.data:
@@ -91,7 +89,6 @@ class MCTS():
             return right
 
     # Do a rollout to some leaf node at the bottom of the tree
-
     def rollout(self, node_key):
         temp_node = node_key
         while(node_key in self.tree.data):
@@ -101,18 +98,19 @@ class MCTS():
         return self.tree.data[temp_node].t / self.tree.data[temp_node].n
 
     # Backup the values from the unexplored node to the root (reverse tree policy path)
-
+    # Backup path starts at the node that did the roll-out, going up to the root.
     def backup(self, path, reward):
         backup_path = path[::-1]
         for backup_key in backup_path:
             self.tree.data[backup_key].t += reward
             self.tree.data[backup_key].n += 1
 
+    # Do a set number of MCTS iterations.
     def perform_iters(self):
         while self.cur_root in self.tree.data:
             for _ in range(self.nr_iters):
                 node_key, path = self.select_node()
-                # Check if node key is leaf
+                # Check if node key is snowcap leaf
                 if self.tree.data[node_key].n == 0:
                     # Perform a number of rollouts from that node.
                     for _ in range(self.nr_rollouts):
@@ -120,12 +118,14 @@ class MCTS():
                         self.backup(path, rollout_reward)
 
             decision_node = self.make_informed_decision()
+            # Non existing child
             if decision_node == -1:
                 break
             else:
                 self.cur_root = decision_node
                 self.informed_path.append(self.cur_root)
 
+    # After a number of MCTS iterations, we pick the child with highest mean value xbar
     def make_informed_decision(self):
         node_key = self.cur_root
 
@@ -143,7 +143,6 @@ class MCTS():
             else:
                 node_key = self.get_random_child(node_key)
         else:
-            # Non-existing
             return -1
 
         return node_key
