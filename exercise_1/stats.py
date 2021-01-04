@@ -11,7 +11,7 @@ def set_ranges(depths, nr_its):
     return np.arange(1, depths + 1), np.arange(nr_its)
 
 
-def plot_rollout_ratio(cvals, depth, nr_its):
+def plot_rollout_ratio(cvals, depth, nr_its, mcts_its, nr_rollouts):
     ratios_accum = {}
 
     for c in cvals:
@@ -22,7 +22,7 @@ def plot_rollout_ratio(cvals, depth, nr_its):
         print(it)
         for c in cvals:
             # TODO: Also experiments for (10, 1)?
-            mcts = MCTS(c, depth, 50, 5)
+            mcts = MCTS(c, depth, mcts_its, nr_rollouts)
             mcts.perform_iters()
 
             # mcts.tree.pp_tree(0, 0)
@@ -97,7 +97,7 @@ def plot_rollout_ratio(cvals, depth, nr_its):
     plt.show()
 
 
-def plot_regret(cvals, depths, nr_its):
+def plot_regret(cvals, depths, nr_its, mcts_its, nr_rollouts):
     ds, its = set_ranges(depths, nr_its)
     ds_regret = {}
     perf = {}
@@ -111,7 +111,7 @@ def plot_regret(cvals, depths, nr_its):
         for d in ds:
             regrets = []
             for c in cvals:
-                mcts = MCTS(c, d, 50, 5)
+                mcts = MCTS(c, d, mcts_its, nr_rollouts)
                 mcts.perform_iters()
                 max_val = mcts.tree.get_max()
                 found_leave = mcts.tree.data[mcts.informed_path[-1]]
@@ -167,7 +167,7 @@ def plot_regret(cvals, depths, nr_its):
     print(total_stds)
 
 
-def plot_perf(depths, nr_its):
+def plot_perf(depths, nr_its, mcts_its, nr_rollouts):
 
     ds, its = set_ranges(depths, nr_its)
 
@@ -182,7 +182,7 @@ def plot_perf(depths, nr_its):
         print(it)
         for d in ds:
             start = timer()
-            mcts = MCTS(2, d, 50, 5)
+            mcts = MCTS(2, d, mcts_its, nr_rollouts)
             mcts.perform_iters()
             end = timer()
             ds_time[d].append(end - start)
@@ -207,9 +207,9 @@ if __name__ == "__main__":
     cs = [0.1, 1, 5, 10, 50, 100]
     # cs = [0.01, 1000]
 
-    # plot_perf(10, 100)
-    # plot_regret(cs, 16, 100)
-    ratios = plot_rollout_ratio(cs, 17, 10)
+    plot_perf(21, 100, 10, 1)
+    # plot_regret(cs, 16, 100, 10, 1)
+    # ratios = plot_rollout_ratio(cs, 17, 100, 10, 1)
     # for c, ratio in ratios:
     #     print(c, ratio)
     #     pass
