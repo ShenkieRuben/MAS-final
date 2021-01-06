@@ -1,6 +1,8 @@
 import numpy as np
+import pandas as pd
 from cell import SpecialCell
 
+import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 from math import floor, ceil
@@ -29,14 +31,15 @@ def pick_random_state(states_indices, state_tuples, grid):
     return starting_state
 
 
-def plot_TD_results(td_qvals, td_rewards, td_names, dims, nr_episodes, alpha, epsilon, alpha_decay, epsilon_decay, decay_step):
+def plot_TD_results(td_qvals, td_rewards, td_names, dims, nr_episodes, alpha, epsilon, decay_step):
     # fig = plt.figure()
     # ax1 = fig.add_subplot(1, 3, 1)
     # ax2 = fig.add_subplot(1, 3, 2, sharey=ax1)
     # ax3 = fig.add_subplot(1, 3, 3)
     # axs = [ax1, ax2, ax3]
 
-    _, axs = plt.subplots(1, 3)
+    fig, axs = plt.subplots(1, 3)
+    fig.set_size_inches(19.2, 10.8)
 
     actions = ['l', 'r', 'u', 'd']
     actions_symbols = {'l': '<', 'r': '>', 'u': '^', 'd': 'v'}
@@ -79,21 +82,25 @@ def plot_TD_results(td_qvals, td_rewards, td_names, dims, nr_episodes, alpha, ep
 
     # Plot rewards
     epis = np.arange(nr_episodes)
-    axs[2].plot(epis, td_rewards[0], label="SARSA")
-    axs[2].plot(epis, td_rewards[1], label="Q-learning")
+    axs[2].plot(epis, pd.Series(td_rewards[0]).rolling(
+        100).mean(), label="SARSA")
+    axs[2].plot(epis, pd.Series(td_rewards[1]).rolling(
+        100).mean(), label="Q-learning")
     axs[2].set_title("Number of episodes (x) \n Accumulated rewards (y)")
     axs[2].legend()
 
-    figManager = plt.get_current_fig_manager()
-    figManager.window.showMaximized()
+    # figManager = plt.get_current_fig_manager()
+    # figManager.window.showMaximized()
     plt.suptitle(
-        f"SARSA vs Q-learning with α={alpha}, ε={epsilon}, α_decay={alpha_decay}, ε_decay={epsilon_decay} and decay_step={decay_step}")
+        f"SARSA vs Q-learning with α={alpha}, ε={epsilon} and decay_step={decay_step}")
     plt.subplots_adjust(top=0.887,
                         bottom=0.051,
                         left=0.025,
                         right=0.985,
                         hspace=0.2,
                         wspace=0.109)
+    fig.savefig(os.path.join(
+        "results", f"td_alph={alpha}_eps={epsilon}_ds={decay_step}.png"), bbox_inches='tight', dpi=200)
     plt.show()
 
 

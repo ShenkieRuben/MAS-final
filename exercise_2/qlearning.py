@@ -100,6 +100,4 @@ def perform_qlearning(alpha, gamma, grid, dims, nr_episodes, epsilon, epsilon_de
             row, col = cur_state
 
         accum_reward.append(total_reward)
-
-    print(f"Qlearning epsilon={epsilon} and alpha={alpha}")
     return qvals, accum_reward

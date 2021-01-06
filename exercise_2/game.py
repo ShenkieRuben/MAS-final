@@ -4,14 +4,16 @@ from mc import mc_policy_eval, plot_mc_heatmaps
 from sarsa import plot_sarsa_heatmap, perform_sarsa
 from qlearning import perform_qlearning, plot_qlearning_heatmap
 
+import numpy as np
+
 
 def main():
     dims = 9
     nr_episodes = 10000
-    alpha, epsilon = 0.1, 0.7
-    epsilon_decay = 0.95
-    alpha_decay = 0.95
-    decay_step = 200
+    alpha, epsilon = 0.5, 0.5
+    epsilon_decay = 0.99
+    alpha_decay = 0.99
+    decay_step = 100
     gamma = 1
 
     # Construct the grid
@@ -48,23 +50,44 @@ def main():
 
     # plot_mc_heatmaps(states, dims)
 
-    # Sarsa
-    qvals, rewards = perform_sarsa(alpha, gamma,  grid, dims,
-                                   nr_episodes, epsilon, epsilon_decay, alpha_decay, decay_step)
-    # plot_sarsa_heatmap(qvals, dims)
+    alphas = [0.2, 0.8]
+    epsilons = [0.2, 0.8]
+    decay_steps = [25, 100]
 
-    # # Qlearning
-    qqvals, qrewards = perform_qlearning(
-        alpha, gamma,  grid, dims, nr_episodes, epsilon, epsilon_decay, alpha_decay, decay_step)
-    # plot_qlearning_heatmap(qqvals, dims)
+    for a in alphas:
+        for e in epsilons:
+            for d in decay_steps:
+                avg_rewards = []
+                avg_qrewards = []
+                avg_qvals = []
+                avg_qqvals = []
+                for i in range(1):
+                    print(i)
+                    # Sarsa
+                    qvals, rewards = perform_sarsa(a, gamma,  grid, dims,
+                                                   nr_episodes, e, epsilon_decay, alpha_decay, d)
+                    # plot_sarsa_heatmap(qvals, dims)
 
-    td_rewards = [rewards, qrewards]
-    td_qvals = [qvals, qqvals]
-    td_names = ["SARSA", "Q-learning"]
-    # plot_rewards(rewards, qrewards, nr_episodes)
-    plot_TD_results(td_qvals, td_rewards, td_names, dims,
-                    nr_episodes, alpha, epsilon, alpha_decay, epsilon_decay, decay_step)
-    # print(qrewards)
+                    # # Qlearning
+                    qqvals, qrewards = perform_qlearning(
+                        a, gamma,  grid, dims, nr_episodes, e, epsilon_decay, alpha_decay, d)
+                    # plot_qlearning_heatmap(qqvals, dims)
+
+                    avg_rewards.append(rewards)
+                    avg_qrewards.append(qrewards)
+                    avg_qvals.append(qvals)
+                    avg_qqvals.append(qqvals)
+
+                avg_rewards = np.average(avg_rewards, axis=0)
+                avg_qrewards = np.average(avg_qrewards, axis=0)
+                avg_qvals = np.average(avg_qvals, axis=0)
+                avg_qqvals = np.average(avg_qqvals, axis=0)
+
+                td_rewards = [avg_rewards, avg_qrewards]
+                td_qvals = [avg_qvals, avg_qqvals]
+                td_names = ["SARSA", "Q-learning"]
+                plot_TD_results(td_qvals, td_rewards, td_names, dims,
+                                nr_episodes, a, e, d)
 
 
 if __name__ == "__main__":
