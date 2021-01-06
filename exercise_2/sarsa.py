@@ -27,7 +27,7 @@ def plot_sarsa_heatmap(qvals, dims):
     plt.show()
 
 
-def perform_sarsa(alpha, grid, dims, nr_episodes, epsilon, epsilon_decay, alpha_decay):
+def perform_sarsa(alpha, gamma, grid, dims, nr_episodes, epsilon, epsilon_decay, alpha_decay, decay_step):
     # Dict to convert states to indices.
     states = {(i, j): i * dims + j
               for i in range(dims) for j in range(dims)}
@@ -43,13 +43,9 @@ def perform_sarsa(alpha, grid, dims, nr_episodes, epsilon, epsilon_decay, alpha_
     actions = ['l', 'r', 'u', 'd']
     accum_reward = []
 
-    # Perhaps change this to random qvals.
-    # qvals = np.random.random((dims * dims, len(actions)))
     qvals = np.zeros((dims * dims, len(actions)))
     for i in range(nr_episodes):
         starting_state = pick_random_state(state_indices, state_vals, grid)
-        # starting_state = (0, 0)
-        # Initialize values and s and a.
         new_state = starting_state
         cur_state = starting_state
         action_index = get_epsilon_greedy_action(
@@ -57,8 +53,9 @@ def perform_sarsa(alpha, grid, dims, nr_episodes, epsilon, epsilon_decay, alpha_
         action = actions[action_index]
         row, col = cur_state
 
-        epsilon *= epsilon_decay
-        alpha *= alpha_decay
+        if i % decay_step == 0:
+            epsilon *= epsilon_decay
+            alpha *= alpha_decay
         total_reward = 0
 
         while not isinstance(grid[row][col], SpecialCell):
@@ -93,7 +90,7 @@ def perform_sarsa(alpha, grid, dims, nr_episodes, epsilon, epsilon_decay, alpha_
             new_qsa = qvals[states[new_state], new_action_index]
 
             qvals[states[cur_state],
-                  action_index] += alpha * (reward + new_qsa - qsa)
+                  action_index] += alpha * (reward + gamma * new_qsa - qsa)
 
             cur_state = new_state
             row, col = cur_state

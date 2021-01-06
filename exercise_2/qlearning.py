@@ -28,7 +28,7 @@ def plot_qlearning_heatmap(qvals, dims):
     plt.show()
 
 
-def perform_qlearning(alpha, grid, dims, nr_episodes, epsilon, epsilon_decay, alpha_decay):
+def perform_qlearning(alpha, gamma, grid, dims, nr_episodes, epsilon, epsilon_decay, alpha_decay, decay_step):
     # Dict to convert states to indices.
     states = {(i, j): i * dims + j
               for i in range(dims) for j in range(dims)}
@@ -49,7 +49,7 @@ def perform_qlearning(alpha, grid, dims, nr_episodes, epsilon, epsilon_decay, al
     # Perhaps change this to random qvals.
     # qvals = np.random.random((dims * dims, len(actions)))
     qvals = np.zeros((dims * dims, len(actions)))
-    for _ in range(nr_episodes):
+    for i in range(nr_episodes):
         starting_state = pick_random_state(state_indices, state_vals, grid)
 
         chosen_states.append(starting_state)
@@ -58,8 +58,9 @@ def perform_qlearning(alpha, grid, dims, nr_episodes, epsilon, epsilon_decay, al
         cur_state = starting_state
         row, col = cur_state
 
-        epsilon *= epsilon_decay
-        alpha *= alpha_decay
+        if i % decay_step == 0:
+            epsilon *= epsilon_decay
+            alpha *= alpha_decay
         total_reward = 0
 
         while not isinstance(grid[row][col], SpecialCell):
@@ -93,11 +94,12 @@ def perform_qlearning(alpha, grid, dims, nr_episodes, epsilon, epsilon_decay, al
             qsa = qvals[states[cur_state], action_index]
             max_qsa = np.max(qvals[states[new_state]])
             qvals[states[cur_state],
-                  action_index] += alpha * (reward + max_qsa - qsa)
+                  action_index] += alpha * (reward + gamma * max_qsa - qsa)
 
             cur_state = new_state
             row, col = cur_state
 
         accum_reward.append(total_reward)
 
+    print(f"Qlearning epsilon={epsilon} and alpha={alpha}")
     return qvals, accum_reward

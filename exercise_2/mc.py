@@ -90,14 +90,22 @@ def mc_policy_eval(nr_episodes, grid, is_random, dims, starting_state=(0, 0), is
     return states_values
 
 
-def plot_mc_heatmap(states, dims):
-    reward_grid = np.resize(list(states.values()), (dims, dims))
-    ax = sns.heatmap(reward_grid, annot=True, fmt=".2f")
-    plt.xticks(np.arange(1, 10))
-    ax.set_xticks(np.arange(0.5, 9))
-    xlabels = [int(x + 0.5) for x in ax.get_xticks()]
-    ylabels = [int(y + 0.5) for y in ax.get_yticks()]
-    ax.set_xticklabels(xlabels)
-    ax.set_yticklabels(ylabels)
+def plot_mc_heatmaps(states, dims):
+
+    fig, axs = plt.subplots(2, 2)
+
+    for i, ax in enumerate(fig.axes):
+        random_starting_state = states[i][0]
+        first_visit = states[i][1]
+        mc_res = states[i][2]
+        reward_grid = np.resize(list(mc_res.values()), (dims, dims))
+        sns.heatmap(reward_grid, annot=True, fmt=".2f", ax=ax, cmap="Spectral")
+        ax.set_xticks(np.arange(0.5, 9))
+        xlabels = [int(x + 0.5) for x in ax.get_xticks()]
+        ylabels = [int(y + 0.5) for y in ax.get_yticks()]
+        ax.set_title(
+            f"Random starting state: {random_starting_state} and first visit: {first_visit}")
+        ax.set_xticklabels(xlabels)
+        ax.set_yticklabels(ylabels)
 
     plt.show()
