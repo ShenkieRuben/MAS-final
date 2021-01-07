@@ -1,6 +1,7 @@
 Required python libraries (install with pip):
+
 1. Python 3.8.5
-2.Numpy
+2. Numpy  
 3. Pandas
 4. Matplotlib
 5. Seaborn
