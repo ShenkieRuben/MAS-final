@@ -1,8 +1,9 @@
 Required python libraries (install with pip):
-1. Numpy
-2. Pandas
-3. Matplotlib
-4. Seaborn
+1. Python 3.8.5
+2.Numpy
+3. Pandas
+4. Matplotlib
+5. Seaborn
 
 Steps to run this program:
 1. Clone this repository
