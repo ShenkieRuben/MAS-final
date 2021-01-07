@@ -83,9 +83,11 @@ def plot_TD_results(td_qvals, td_rewards, td_names, dims, nr_episodes, alpha, ep
     # Plot rewards
     epis = np.arange(nr_episodes)
     axs[2].plot(epis, pd.Series(td_rewards[0]).rolling(
-        100).mean(), label="SARSA")
+        5).mean(), label="SARSA")
     axs[2].plot(epis, pd.Series(td_rewards[1]).rolling(
-        100).mean(), label="Q-learning")
+        5).mean(), label="Q-learning")
+    # axs[2].plot(epis, td_rewards[0], label="SARSA")
+    # axs[2].plot(epis, td_rewards[1], label="Q-learning")
     axs[2].set_title("Number of episodes (x) \n Accumulated rewards (y)")
     axs[2].legend()
 
@@ -101,7 +103,7 @@ def plot_TD_results(td_qvals, td_rewards, td_names, dims, nr_episodes, alpha, ep
                         wspace=0.109)
     fig.savefig(os.path.join(
         "results", f"td_alph={alpha}_eps={epsilon}_ds={decay_step}.png"), bbox_inches='tight', dpi=200)
-    plt.show()
+    # plt.show()
 
 
 def plot_rewards(rewards, qrewards, nr_episodes):

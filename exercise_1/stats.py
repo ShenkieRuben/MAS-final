@@ -207,7 +207,7 @@ if __name__ == "__main__":
     cs = [0.1, 1, 5, 10, 50, 100]
     # cs = [0.01, 1000]
 
-    plot_perf(21, 100, 10, 1)
+    plot_perf(21, 100, 50, 5)
     # plot_regret(cs, 16, 100, 10, 1)
     # ratios = plot_rollout_ratio(cs, 17, 100, 10, 1)
     # for c, ratio in ratios:

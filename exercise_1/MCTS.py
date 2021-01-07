@@ -152,9 +152,6 @@ if __name__ == "__main__":
     mcts = MCTS(100, 4, 50, 5)
     mcts.perform_iters()
     mcts.tree.pp_tree(0, 0)
-    # mcts.tree.debug_tree()
+    mcts.tree.debug_tree()
 
-    # print(mcts.informed_path)
-    # found = mcts.tree.data[mcts.informed_path[-1]]
-    # print(found.t/found.n)
-    pass
+    print(mcts.informed_path)
