@@ -9,7 +9,7 @@ import numpy as np
 
 def main():
     dims = 9
-    nr_episodes = 10000
+    nr_episodes = 1000
     alpha, epsilon = 0.5, 0.5
     epsilon_decay = 0.99
     alpha_decay = 0.99
@@ -35,24 +35,27 @@ def main():
     # Treasure
     grid[8][8] = SpecialCell(True, 50)
 
-    # # Mc policy eval
-    # states1 = mc_policy_eval(nr_episodes, grid, True,
-    #                          dims, is_first_visit=True)
-    # states2 = mc_policy_eval(nr_episodes, grid, True,
-    #                          dims, is_first_visit=False)
-    # states3 = mc_policy_eval(nr_episodes, grid, False,
-    #                          dims, is_first_visit=True)
-    # states4 = mc_policy_eval(nr_episodes, grid, False,
-    #                          dims, is_first_visit=False)
+    print("Plotting MC policy evaluation results.")
+    # Mc policy eval
+    states1 = mc_policy_eval(nr_episodes, grid, True,
+                             dims, is_first_visit=True)
+    states2 = mc_policy_eval(nr_episodes, grid, True,
+                             dims, is_first_visit=False)
+    states3 = mc_policy_eval(nr_episodes, grid, False,
+                             dims, is_first_visit=True)
+    states4 = mc_policy_eval(nr_episodes, grid, False,
+                             dims, is_first_visit=False)
 
-    # states = [(True, True, states1), (True, False, states2),
-    #           (False, True, states3), (False, False, states4)]
+    states = [(True, True, states1), (True, False, states2),
+              (False, True, states3), (False, False, states4)]
 
-    # plot_mc_heatmaps(states, dims)
+    plot_mc_heatmaps(states, dims)
 
     alphas = [0.2, 0.8]
     epsilons = [0.2, 0.8]
     decay_steps = [25, 100]
+
+    print("Saving SARSA and Q-learning heatmaps and reward curves to results.")
 
     for a in alphas:
         for e in epsilons:

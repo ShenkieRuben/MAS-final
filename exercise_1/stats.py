@@ -61,7 +61,6 @@ def plot_rollout_ratio(cvals, depth, nr_its, mcts_its, nr_rollouts):
         std = np.std(val)
         ratios_accum[key] = (avg, std)
 
-    print(ratios_accum)
     fig, axs = plt.subplots(3, 2)
     palette = itertools.cycle(sns.color_palette())
 
@@ -126,7 +125,6 @@ def plot_regret(cvals, depths, nr_its, mcts_its, nr_rollouts):
         stds = np.std(regret_matrix, axis=0)
         perf[d] = (avgs, stds)
 
-    print(perf)
     total_avgs = []
     total_stds = []
 
@@ -163,9 +161,6 @@ def plot_regret(cvals, depths, nr_its, mcts_its, nr_rollouts):
 
     plt.show()
 
-    print(total_avgs)
-    print(total_stds)
-
 
 def plot_perf(depths, nr_its, mcts_its, nr_rollouts):
 
@@ -193,6 +188,7 @@ def plot_perf(depths, nr_its, mcts_its, nr_rollouts):
 
     res = list(perf.values())
     res = list(zip(*res))
+
     means = res[0]
     stds = res[1]
     plt.errorbar(list(perf.keys()), means, stds, fmt="-", capsize=5)
@@ -207,9 +203,9 @@ if __name__ == "__main__":
     cs = [0.1, 1, 5, 10, 50, 100]
     # cs = [0.01, 1000]
 
+    print("Plotting performance (time)")
     plot_perf(21, 100, 50, 5)
-    # plot_regret(cs, 16, 100, 10, 1)
-    # ratios = plot_rollout_ratio(cs, 17, 100, 10, 1)
-    # for c, ratio in ratios:
-    #     print(c, ratio)
-    #     pass
+    print("Plotting regret")
+    plot_regret(cs, 16, 100, 10, 1)
+    print("Plot exploration ration")
+    ratios = plot_rollout_ratio(cs, 17, 100, 10, 1)

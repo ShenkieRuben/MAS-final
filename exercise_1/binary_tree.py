@@ -74,7 +74,6 @@ class Tree:
                     max = xbar
                     node_key = key
 
-        # print(f"Max node is {node_key} with value {max}")
         return max
 
     def pp_tree(self, node_key, level):

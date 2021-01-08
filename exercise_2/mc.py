@@ -84,7 +84,6 @@ def mc_policy_eval(nr_episodes, grid, is_random, dims, starting_state=(0, 0), is
                     episode_counts[cur_state] += 1
                     grid[row][col].is_visited = True
 
-    # print(episode_counts)
     states_values = {k: v/episode_counts[k] if episode_counts[k]
                      != 0 else v for k, v in states_values.items()}
     return states_values
